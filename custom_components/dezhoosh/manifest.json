@@ -1,0 +1,14 @@
+{
+    "domain": "dezhoosh",
+    "name": "Dezhoosh",
+    "version": "0.0.1",
+    "documentation": "https://github.com/masihch/dezhoosh-home-assistant",
+    "issue_tracker": "https://github.com/masihch/dezhoosh-home-assistant/issues",
+    "dependencies": [],
+    "requirements": [],
+    "codeowners": [
+        "@masihch"
+    ],
+    "config_flow": true,
+    "iot_class": "local_push"
+}
