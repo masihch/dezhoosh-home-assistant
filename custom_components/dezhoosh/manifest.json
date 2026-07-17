@@ -4,7 +4,9 @@
     "version": "0.0.1",
     "documentation": "https://github.com/masihch/dezhoosh-home-assistant",
     "issue_tracker": "https://github.com/masihch/dezhoosh-home-assistant/issues",
-    "dependencies": [],
+    "dependencies": [
+        "mqtt"
+    ],
     "requirements": [],
     "codeowners": [
         "@masihch"
