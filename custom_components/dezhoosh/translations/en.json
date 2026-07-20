@@ -1,10 +1,13 @@
 {
-    "config": {
-        "step": {
-            "user": {
-                "title": "Dezhoosh",
-                "description": "Welcome to Dezhoosh Integration."
-            }
-        }
+  "config": {
+    "step": {
+      "user": {
+        "title": "Dezhoosh",
+        "description": "Enter your Dezhoosh License Key."
+      }
+    },
+    "error": {
+      "invalid_license": "Invalid license key."
     }
+  }
 }
