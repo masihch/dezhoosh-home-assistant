@@ -1,71 +1,34 @@
 from __future__ import annotations
 
-import json
 import logging
 
-from homeassistant.components import mqtt
 from homeassistant.core import HomeAssistant
 
-from .const import (
-    TOPIC_SYSTEM_PING,
-    TOPIC_SYSTEM_PONG,
-    VERSION,
-)
+from .system import SystemCommandHandler
 
 _LOGGER = logging.getLogger(__name__)
 
 
 class DezhooshMQTT:
-    """MQTT Manager for Dezhoosh."""
+    """Thin MQTT transport coordinator for Dezhoosh.
 
-    def __init__(self, hass: HomeAssistant):
+    Delegates the system protocol to :class:`~.system.SystemCommandHandler`.
+    Device discovery and runtime traffic are owned by the coordinator
+    (see :mod:`.device_manager`).
+    """
+
+    def __init__(self, hass: HomeAssistant) -> None:
         self.hass = hass
+        self.system = SystemCommandHandler(hass)
 
-    async def async_subscribe(self):
-        """Subscribe to Dezhoosh MQTT topics."""
+    async def async_start(self) -> None:
+        """Start all MQTT subscriptions owned by the transport layer."""
 
-        await mqtt.async_subscribe(
-            self.hass,
-            TOPIC_SYSTEM_PING,
-            self.async_ping_received,
-            qos=1,
-        )
+        await self.system.async_start()
+        _LOGGER.debug("Dezhoosh MQTT: transport started")
 
-        _LOGGER.warning(
-            "Dezhoosh MQTT: subscribed to %s",
-            TOPIC_SYSTEM_PING,
-        )
+    async def async_stop(self) -> None:
+        """Tear down MQTT subscriptions."""
 
-    async def async_ping_received(self, msg):
-        """Handle incoming Ping message."""
-
-        _LOGGER.warning(
-            "MQTT RX -> topic=%s payload=%s",
-            msg.topic,
-            msg.payload,
-        )
-
-        await self.async_publish_pong()
-
-    async def async_publish_pong(self):
-        """Publish Pong response."""
-
-        payload = {
-            "status": "ok",
-            "integration": "dezhoosh",
-            "version": VERSION,
-        }
-
-        await mqtt.async_publish(
-            self.hass,
-            TOPIC_SYSTEM_PONG,
-            json.dumps(payload),
-            qos=1,
-            retain=False,
-        )
-
-        _LOGGER.warning(
-            "MQTT TX -> topic=%s payload=%s",
-            TOPIC_SYSTEM_PONG,
-            payload,
-        )
+        await self.system.async_stop()
+        _LOGGER.debug("Dezhoosh MQTT: transport stopped")

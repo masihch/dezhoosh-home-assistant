@@ -38,7 +38,9 @@ class DezhooshConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 user_input["license"],
             )
 
-            if result.get("status") == "ok":
+            status = result.get("status")
+
+            if status == "ok":
 
                 return self.async_create_entry(
                     title="Dezhoosh",
@@ -50,7 +52,10 @@ class DezhooshConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     },
                 )
 
-            errors["base"] = "invalid_license"
+            if status in ("timeout", "error"):
+                errors["base"] = "cannot_connect"
+            else:
+                errors["base"] = "invalid_license"
 
         return self.async_show_form(
             step_id="user",

@@ -1,13 +1,20 @@
 {
-  "config": {
-    "step": {
-      "user": {
-        "title": "Dezhoosh",
-        "description": "Enter your Dezhoosh License Key."
-      }
-    },
-    "error": {
-      "invalid_license": "Invalid license key."
+    "config": {
+        "step": {
+            "user": {
+                "title": "Dezhoosh",
+                "description": "Enter your Dezhoosh License Key.",
+                "data": {
+                    "license": "License Key"
+                }
+            }
+        },
+        "error": {
+            "invalid_license": "Invalid license key.",
+            "cannot_connect": "Could not connect to the Dezhoosh server. Please try again."
+        },
+        "abort": {
+            "already_configured": "Dezhoosh is already configured."
+        }
     }
-  }
 }

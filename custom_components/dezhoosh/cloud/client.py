@@ -44,7 +44,7 @@ class CloudClient:
                     json=payload,
                 ) as response:
 
-                    data = await response.json()
+                    data = await response.json(content_type=None)
 
                     _LOGGER.debug(
                         "Cloud POST %s -> %s",

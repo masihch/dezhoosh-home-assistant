@@ -1,0 +1,51 @@
+# Dezhoosh Aqua - green/blue glass theme for Home Assistant.
+#
+# To use manually, copy this file into <config>/themes/ and add
+#   frontend:
+#     themes: !include_dir_merge_named themes
+# to configuration.yaml, then pick "Dezhoosh Aqua" from your user profile.
+#
+# The Dezhoosh integration also registers this theme automatically at runtime.
+Dezhoosh Aqua:
+  # Base palette
+  primary-color: "#12b6a6"
+  accent-color: "#1fd4c3"
+  dark-primary-color: "#0e8f83"
+  light-primary-color: "#8ff0e6"
+
+  # Backgrounds
+  primary-background-color: "#071c22"
+  secondary-background-color: "#0c2a31"
+  card-background-color: "rgba(16, 46, 54, 0.72)"
+  ha-card-background: "rgba(16, 46, 54, 0.72)"
+
+  # Text
+  primary-text-color: "#e6fffb"
+  secondary-text-color: "#8fd7cf"
+  text-primary-color: "#04141a"
+  disabled-text-color: "#4f7f79"
+
+  # Structure
+  divider-color: "rgba(31, 212, 195, 0.16)"
+  ha-card-border-radius: "18px"
+  ha-card-box-shadow: "0 8px 30px rgba(4, 20, 26, 0.45)"
+
+  # App header / sidebar
+  app-header-background-color: "rgba(7, 28, 34, 0.85)"
+  app-header-text-color: "#e6fffb"
+  sidebar-background-color: "rgba(7, 28, 34, 0.9)"
+  sidebar-icon-color: "#8fd7cf"
+  sidebar-selected-icon-color: "#1fd4c3"
+  sidebar-selected-text-color: "#1fd4c3"
+
+  # States / switches
+  switch-checked-color: "#1fd4c3"
+  switch-checked-track-color: "#12b6a6"
+  paper-item-icon-active-color: "#1fd4c3"
+  state-icon-active-color: "#1fd4c3"
+
+  # Badges / tables
+  label-badge-background-color: "#0c2a31"
+  label-badge-text-color: "#e6fffb"
+  table-row-background-color: "#0c2a31"
+  table-row-alternative-background-color: "#0e333b"
