@@ -53,7 +53,7 @@ async def async_setup_entry(
     # Cloud
     # ------------------------------------------------------------
 
-    cloud = CloudManager(CLOUD_BASE_URL)
+    cloud = CloudManager(CLOUD_BASE_URL, hass=hass)
 
     await cloud.restore(entry)
 

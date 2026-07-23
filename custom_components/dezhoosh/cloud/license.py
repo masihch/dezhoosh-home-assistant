@@ -1,10 +1,9 @@
 from __future__ import annotations
 
+from ..const import API_LICENSE_ACTIVATE
 from .client import CloudClient
 from .mapper import CloudMapper
 from .session import CloudSession
-
-from ..const import API_LICENSE_ACTIVATE
 
 
 class LicenseService:
@@ -17,7 +16,11 @@ class LicenseService:
         self,
         license_key: str,
     ) -> CloudSession | dict:
-        """Activate a Dezhoosh license."""
+        """Activate a Dezhoosh license.
+
+        Returns a CloudSession on success, or the raw response dict
+        (always containing a "status" key) on failure.
+        """
 
         response = await self.client.post(
             API_LICENSE_ACTIVATE,
@@ -26,7 +29,12 @@ class LicenseService:
             },
         )
 
-        # Connection / server error
+        # CloudClient.post() always returns a dict, but stay defensive in
+        # case that contract ever changes.
+        if not isinstance(response, dict):
+            return {"status": "error", "message": "invalid response from server"}
+
+        # Connection / server error / rejected license
         if response.get("status") != "ok":
             return response
 

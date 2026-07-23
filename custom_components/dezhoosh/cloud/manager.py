@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
+from ..const import LICENSE_STATE_ACTIVE
 from .client import CloudClient
 from .license import LicenseService
 from .mapper import CloudMapper
@@ -11,8 +14,13 @@ from .session import CloudSession
 class CloudManager:
     """Main Cloud Manager."""
 
-    def __init__(self, base_url: str):
-        self.client = CloudClient(base_url)
+    def __init__(self, base_url: str, hass: HomeAssistant | None = None):
+        # Reuse Home Assistant's shared aiohttp session when available
+        # (normal runtime use); fall back to a private one otherwise
+        # (e.g. standalone scripts/tests outside of HA).
+        session = async_get_clientsession(hass) if hass is not None else None
+
+        self.client = CloudClient(base_url, session=session)
 
         self.license = LicenseService(self.client)
 
@@ -72,5 +80,16 @@ class CloudManager:
 
     @property
     def is_authenticated(self) -> bool:
-        """Return True if a valid cloud session exists."""
-        return self.session is not None
+        """Return True only if a currently-active license session exists.
+
+        A CloudSession object existing is NOT enough on its own - restore()
+        always produces one, even from empty/missing config-entry data. A
+        license is only actually usable if it has a key AND the cloud
+        reported its state as active.
+        """
+        if self.session is None:
+            return False
+
+        return bool(self.session.license.key) and (
+            self.session.license.state == LICENSE_STATE_ACTIVE
+        )
