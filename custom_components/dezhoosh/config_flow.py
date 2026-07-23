@@ -2,14 +2,23 @@
 
 from __future__ import annotations
 
+from dataclasses import asdict
+
 import voluptuous as vol
 
 from homeassistant import config_entries
 
-from .cloud.client import CloudClient
-from .cloud.license import LicenseService
+from .cloud.manager import CloudManager
+from .cloud.session import CloudSession
 from .const import (
     CLOUD_BASE_URL,
+    CONF_CLOUD_VERSION,
+    CONF_CUSTOMER,
+    CONF_FEATURES,
+    CONF_HOME,
+    CONF_LICENSE,
+    CONF_LICENSE_KEY,
+    CONF_SERVICES,
     DOMAIN,
 )
 
@@ -20,9 +29,8 @@ class DezhooshConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     VERSION = 1
 
     async def async_step_user(self, user_input=None):
-        """Handle the initial step."""
+        """Handle first setup step."""
 
-        # Allow only one Dezhoosh integration
         await self.async_set_unique_id(DOMAIN)
         self._abort_if_unique_id_configured()
 
@@ -30,27 +38,28 @@ class DezhooshConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         if user_input is not None:
 
-            client = CloudClient(CLOUD_BASE_URL)
+            cloud = CloudManager(CLOUD_BASE_URL)
 
-            license_service = LicenseService(client)
-
-            result = await license_service.activate(
-                user_input["license"],
+            session = await cloud.license.activate(
+                user_input["license"]
             )
 
-            status = result.get("status")
-
-            if status == "ok":
+            if isinstance(session, CloudSession):
 
                 return self.async_create_entry(
                     title="Dezhoosh",
                     data={
-                        "license": user_input["license"],
-                        "customer": result.get("customer", {}),
-                        "license_info": result.get("license", {}),
-                        "services": result.get("services", {}),
+                        CONF_LICENSE_KEY: user_input["license"],
+                        CONF_CLOUD_VERSION: session.version,
+                        CONF_CUSTOMER: asdict(session.customer),
+                        CONF_LICENSE: asdict(session.license),
+                        CONF_SERVICES: asdict(session.services),
+                        CONF_HOME: asdict(session.home),
+                        CONF_FEATURES: asdict(session.features),
                     },
                 )
+
+            status = session.get("status")
 
             if status in ("timeout", "error"):
                 errors["base"] = "cannot_connect"
