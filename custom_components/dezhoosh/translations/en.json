@@ -3,15 +3,8 @@
         "step": {
             "user": {
                 "title": "Dezhoosh",
-                "description": "Enter your Dezhoosh License Key.",
-                "data": {
-                    "license": "License Key"
-                }
+                "description": "Set up Dezhoosh device discovery. Devices are found automatically over MQTT - no further configuration is needed."
             }
-        },
-        "error": {
-            "invalid_license": "Invalid license key.",
-            "cannot_connect": "Could not connect to the Dezhoosh server. Please try again."
         },
         "abort": {
             "already_configured": "Dezhoosh is already configured."

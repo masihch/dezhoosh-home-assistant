@@ -25,7 +25,7 @@ import logging
 from dataclasses import dataclass, field
 from typing import Any, Awaitable, Callable
 
-from .const import VERSION
+from ..const import VERSION
 
 _LOGGER = logging.getLogger(__name__)
 

@@ -17,8 +17,7 @@ from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import DATA_COORDINATOR, DOMAIN, SIGNAL_ADD_SWITCH
-from .device_manager import DezhooshCoordinator
-from .models import DezhooshChannel, DezhooshDevice
+from .devices import DezhooshChannel, DezhooshCoordinator, DezhooshDevice
 
 _LOGGER = logging.getLogger(__name__)
 

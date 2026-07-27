@@ -4,34 +4,7 @@ DOMAIN = "dezhoosh"
 
 NAME = "Dezhoosh"
 
-VERSION = "0.0.1"
-
-# ============================================================================
-# Cloud
-# ============================================================================
-
-CLOUD_BASE_URL = "https://lab.masihch.com/haos"
-
-# Cloud API
-API_LICENSE_ACTIVATE = "/check.php"
-
-# ============================================================================
-# Config Entry Keys
-# ============================================================================
-
-CONF_LICENSE_KEY = "license_key"
-
-CONF_CLOUD_VERSION = "cloud_version"
-
-CONF_CUSTOMER = "customer"
-
-CONF_LICENSE = "license"
-
-CONF_SERVICES = "services"
-
-CONF_HOME = "home"
-
-CONF_FEATURES = "features"
+VERSION = "0.1.0"
 
 # ============================================================================
 # MQTT
@@ -72,16 +45,6 @@ TOPIC_DEVICE_AVAILABILITY = f"{MQTT_ROOT}/status"
 DISCOVERY_PROTOCOL_VERSION = 1
 
 # ============================================================================
-# License States
-# ============================================================================
-
-LICENSE_STATE_ACTIVE = "active"
-
-LICENSE_STATE_DISABLED = "disabled"
-
-LICENSE_STATE_EXPIRED = "expired"
-
-# ============================================================================
 # Device model / discovery vocabulary
 # ============================================================================
 
@@ -116,8 +79,6 @@ SIGNAL_ADD_SENSOR = f"{DOMAIN}_add_sensor"
 # ============================================================================
 
 DATA_COORDINATOR = "coordinator"
-
-DATA_CLOUD = "cloud"
 
 DATA_DISCOVERY = "discovery"
 

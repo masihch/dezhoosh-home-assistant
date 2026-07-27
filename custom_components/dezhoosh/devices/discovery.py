@@ -38,7 +38,7 @@ from typing import Any, Callable
 from homeassistant.components import mqtt
 from homeassistant.core import HomeAssistant
 
-from .const import (
+from ..const import (
     BRIDGE_MODELS,
     DEVICE_TYPE_SENSOR,
     DEVICE_TYPE_SWITCH,

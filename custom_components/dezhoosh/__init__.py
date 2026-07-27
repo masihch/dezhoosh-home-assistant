@@ -6,20 +6,18 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
 from .const import (
-    CLOUD_BASE_URL,
     DATA_COORDINATOR,
     DOMAIN,
     PLATFORMS,
 )
 
-from .cloud.manager import CloudManager
-from .device_manager import DezhooshCoordinator
+from .devices import DezhooshCoordinator
 from .frontend import (
     async_register_frontend,
     async_unregister_frontend,
 )
 from .mqtt import DezhooshMQTT
-from .system_commands import registry as system_command_registry
+from .mqtt.system_commands import registry as system_command_registry
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -50,14 +48,6 @@ async def async_setup_entry(
     await async_register_frontend(hass)
 
     # ------------------------------------------------------------
-    # Cloud
-    # ------------------------------------------------------------
-
-    cloud = CloudManager(CLOUD_BASE_URL, hass=hass)
-
-    await cloud.restore(entry)
-
-    # ------------------------------------------------------------
     # MQTT
     # ------------------------------------------------------------
 
@@ -74,9 +64,6 @@ async def async_setup_entry(
         entry.entry_id,
     )
 
-    # دسترسی Coordinator به Cloud
-    coordinator.cloud = cloud
-
     await coordinator.async_start()
 
     # ------------------------------------------------------------
@@ -84,7 +71,6 @@ async def async_setup_entry(
     # ------------------------------------------------------------
 
     system_command_registry.context["coordinator"] = coordinator
-    system_command_registry.context["cloud"] = cloud
 
     # ------------------------------------------------------------
     # Runtime Store
@@ -93,7 +79,6 @@ async def async_setup_entry(
     hass.data.setdefault(DOMAIN, {})
 
     hass.data[DOMAIN][entry.entry_id] = {
-        "cloud": cloud,
         "mqtt": mqtt_manager,
         DATA_COORDINATOR: coordinator,
     }
@@ -142,11 +127,6 @@ async def async_unload_entry(
 
     system_command_registry.context.pop(
         "coordinator",
-        None,
-    )
-
-    system_command_registry.context.pop(
-        "cloud",
         None,
     )
 

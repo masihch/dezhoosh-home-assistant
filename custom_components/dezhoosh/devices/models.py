@@ -10,7 +10,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
-from .const import (
+from ..const import (
     BRIDGE_MODELS,
     DEVICE_TYPE_SENSOR,
     DEVICE_TYPE_SWITCH,

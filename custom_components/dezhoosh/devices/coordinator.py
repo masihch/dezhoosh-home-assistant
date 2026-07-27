@@ -16,7 +16,7 @@ from homeassistant.components import mqtt
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 
-from .const import (
+from ..const import (
     SIGNAL_ADD_SENSOR,
     SIGNAL_ADD_SWITCH,
 )

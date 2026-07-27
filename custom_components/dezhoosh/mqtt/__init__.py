@@ -14,7 +14,7 @@ class DezhooshMQTT:
 
     Delegates the system protocol to :class:`~.system.SystemCommandHandler`.
     Device discovery and runtime traffic are owned by the coordinator
-    (see :mod:`.device_manager`).
+    (see :mod:`..devices.coordinator`).
     """
 
     def __init__(self, hass: HomeAssistant) -> None:

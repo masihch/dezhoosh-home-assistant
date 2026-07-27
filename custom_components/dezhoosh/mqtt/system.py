@@ -16,7 +16,7 @@ from typing import Any, Callable
 from homeassistant.components import mqtt
 from homeassistant.core import HomeAssistant
 
-from .const import TOPIC_SYSTEM_COMMAND_WILDCARD, TOPIC_SYSTEM_PREFIX
+from ..const import TOPIC_SYSTEM_COMMAND_WILDCARD, TOPIC_SYSTEM_PREFIX
 from .system_commands import registry as system_command_registry
 
 _LOGGER = logging.getLogger(__name__)
