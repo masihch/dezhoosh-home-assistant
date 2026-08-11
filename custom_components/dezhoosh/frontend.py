@@ -1,14 +1,17 @@
 """Frontend registration for Dezhoosh.
 
 Serves the compiled glass-morphism Lovelace cards as a static URL, registers
-them as Lovelace resources (so users don't have to add them manually), and
-installs the Dezhoosh green-blue theme into Home Assistant's theme registry.
+them as Lovelace resources, and loads Dezhoosh themes from the themes
+directory into Home Assistant's live theme store.
 """
 
 from __future__ import annotations
 
 import logging
 import os
+from pathlib import Path
+
+import yaml
 
 from homeassistant.core import HomeAssistant
 
@@ -18,15 +21,13 @@ URL_BASE = "/dezhoosh"
 CARD_FILENAME = "dezhoosh-cards.js"
 CARD_URL = f"{URL_BASE}/{CARD_FILENAME}"
 
-THEME_NAME = "Dezhoosh Aqua"
-
 
 def _www_path() -> str:
     return os.path.join(os.path.dirname(__file__), "www")
 
 
 async def async_register_frontend(hass: HomeAssistant) -> None:
-    """Register the card bundle and theme."""
+    """Register the card bundle and themes."""
 
     await _async_register_static_path(hass)
     await _async_register_lovelace_resource(hass)
@@ -38,16 +39,22 @@ async def async_unregister_frontend(hass: HomeAssistant) -> None:
 
     try:
         resources = hass.data["lovelace"].resources
+
         if resources is None:
             return
+
         if not resources.loaded:
             await resources.async_load()
             resources.loaded = True
+
         for item in list(resources.async_items()):
             if item.get("url", "").startswith(CARD_URL):
                 await resources.async_delete_item(item["id"])
+
     except Exception:  # noqa: BLE001 - frontend cleanup is best effort
-        _LOGGER.debug("Dezhoosh: could not remove Lovelace resource")
+        _LOGGER.debug(
+            "Dezhoosh: could not remove Lovelace resource"
+        )
 
 
 async def _async_register_static_path(hass: HomeAssistant) -> None:
@@ -59,24 +66,45 @@ async def _async_register_static_path(hass: HomeAssistant) -> None:
         from homeassistant.components.http import StaticPathConfig
 
         await hass.http.async_register_static_paths(
-            [StaticPathConfig(URL_BASE, path, cache_headers=False)]
+            [
+                StaticPathConfig(
+                    URL_BASE,
+                    path,
+                    cache_headers=False,
+                )
+            ]
         )
+
     except (ImportError, AttributeError):
         # Fallback for older Home Assistant releases.
-        hass.http.register_static_path(URL_BASE, path, cache_headers=False)
+        hass.http.register_static_path(
+            URL_BASE,
+            path,
+            cache_headers=False,
+        )
 
-    _LOGGER.debug("Dezhoosh: static path %s -> %s", URL_BASE, path)
+    _LOGGER.debug(
+        "Dezhoosh: static path %s -> %s",
+        URL_BASE,
+        path,
+    )
 
 
-async def _async_register_lovelace_resource(hass: HomeAssistant) -> None:
+async def _async_register_lovelace_resource(
+    hass: HomeAssistant,
+) -> None:
     """Auto-register the card JS as a Lovelace module resource."""
 
     lovelace = hass.data.get("lovelace")
+
     if lovelace is None:
-        _LOGGER.debug("Dezhoosh: lovelace not ready, skipping resource")
+        _LOGGER.debug(
+            "Dezhoosh: lovelace not ready, skipping resource"
+        )
         return
 
     resources = getattr(lovelace, "resources", None)
+
     if resources is None:
         return
 
@@ -86,54 +114,120 @@ async def _async_register_lovelace_resource(hass: HomeAssistant) -> None:
 
     for item in resources.async_items():
         if item.get("url", "").startswith(CARD_URL):
-            return  # already registered
+            return
 
     await resources.async_create_item(
-        {"res_type": "module", "url": CARD_URL}
+        {
+            "res_type": "module",
+            "url": CARD_URL,
+        }
     )
-    _LOGGER.debug("Dezhoosh: registered Lovelace resource %s", CARD_URL)
+
+    _LOGGER.debug(
+        "Dezhoosh: registered Lovelace resource %s",
+        CARD_URL,
+    )
 
 
-async def _async_register_theme(hass: HomeAssistant) -> None:
-    """Register the Dezhoosh Aqua theme in Home Assistant's live theme store.
+async def _async_register_theme(
+    hass: HomeAssistant,
+) -> None:
+    """Load all Dezhoosh themes into Home Assistant."""
 
-    Home Assistant keeps installed themes in ``hass.data[DATA_THEMES]`` (key
-    ``"frontend_themes"``), populated by the ``frontend`` integration from
-    ``configuration.yaml`` on startup. There is no public "install a theme"
-    service, so we merge our theme dict directly into that store and fire
-    ``EVENT_THEMES_UPDATED`` - the same event the frontend integration fires
-    itself after ``frontend.reload_themes`` - so it shows up in the theme
-    picker immediately, without a restart.
+    themes = _load_themes()
 
-    ``frontend`` is a hard dependency in ``manifest.json``, so by the time
-    this integration's ``async_setup_entry`` runs, the frontend component
-    has already initialized ``hass.data[DATA_THEMES]``.
-    """
-
-    themes = _dezhoosh_theme()
+    if not themes:
+        _LOGGER.warning(
+            "Dezhoosh: no valid themes found"
+        )
+        return
 
     themes_key, themes_updated_event = _frontend_theme_keys()
 
     try:
-        existing = hass.data.setdefault(themes_key, {})
+        existing = hass.data.setdefault(
+            themes_key,
+            {},
+        )
+
         existing.update(themes)
-    except Exception:  # noqa: BLE001 - never block setup on theme injection
-        _LOGGER.warning("Dezhoosh: could not register the Dezhoosh Aqua theme")
+
+    except Exception:  # noqa: BLE001
+        _LOGGER.warning(
+            "Dezhoosh: could not register Dezhoosh themes"
+        )
         return
 
     if themes_updated_event is not None:
         hass.bus.async_fire(themes_updated_event)
 
-    _LOGGER.debug("Dezhoosh: registered theme '%s'", THEME_NAME)
+    _LOGGER.info(
+        "Dezhoosh: registered %d theme(s)",
+        len(themes),
+    )
+
+
+def _load_themes() -> dict:
+    """Load all YAML theme files from the themes directory."""
+
+    themes_path = Path(__file__).parent / "themes"
+
+    if not themes_path.exists():
+        _LOGGER.warning(
+            "Dezhoosh: themes directory does not exist: %s",
+            themes_path,
+        )
+        return {}
+
+    themes = {}
+
+    # Load both .yaml and .yml files.
+    theme_files = sorted(
+        [
+            *themes_path.glob("*.yaml"),
+            *themes_path.glob("*.yml"),
+        ]
+    )
+
+    for theme_file in theme_files:
+        try:
+            with theme_file.open(
+                "r",
+                encoding="utf-8",
+            ) as file:
+                data = yaml.safe_load(file)
+
+        except Exception as err:  # noqa: BLE001
+            _LOGGER.error(
+                "Dezhoosh: failed to read theme file %s: %s",
+                theme_file,
+                err,
+            )
+            continue
+
+        if not isinstance(data, dict):
+            _LOGGER.warning(
+                "Dezhoosh: theme file %s does not contain a mapping",
+                theme_file,
+            )
+            continue
+
+        themes.update(data)
+
+        _LOGGER.debug(
+            "Dezhoosh: loaded theme file %s",
+            theme_file.name,
+        )
+
+    return themes
 
 
 def _frontend_theme_keys():
-    """Return the ``hass.data`` themes key and the themes-updated event.
+    """Return the hass.data themes key and the themes-updated event.
 
-    Both are resolved dynamically (rather than imported at module load
-    time) so this integration keeps working across the HA versions that
-    expose ``DATA_THEMES``/``EVENT_THEMES_UPDATED`` as plain strings and the
-    newer versions that expose them as ``HassKey`` objects.
+    Both are resolved dynamically rather than imported at module load time so
+    this integration keeps working across Home Assistant versions that expose
+    DATA_THEMES/EVENT_THEMES_UPDATED differently.
     """
 
     try:
@@ -147,39 +241,3 @@ def _frontend_theme_keys():
         EVENT_THEMES_UPDATED = None
 
     return DATA_THEMES, EVENT_THEMES_UPDATED
-
-
-def _dezhoosh_theme() -> dict:
-    """Return the Dezhoosh Aqua theme definition (green-blue glass)."""
-
-    return {
-        THEME_NAME: {
-            "primary-color": "#12b6a6",
-            "accent-color": "#1fd4c3",
-            "dark-primary-color": "#0e8f83",
-            "light-primary-color": "#8ff0e6",
-            "primary-background-color": "#071c22",
-            "secondary-background-color": "#0c2a31",
-            "card-background-color": "rgba(16, 46, 54, 0.72)",
-            "primary-text-color": "#e6fffb",
-            "secondary-text-color": "#8fd7cf",
-            "text-primary-color": "#04141a",
-            "divider-color": "rgba(31, 212, 195, 0.16)",
-            "app-header-background-color": "rgba(7, 28, 34, 0.85)",
-            "app-header-text-color": "#e6fffb",
-            "sidebar-background-color": "rgba(7, 28, 34, 0.9)",
-            "sidebar-icon-color": "#8fd7cf",
-            "sidebar-selected-icon-color": "#1fd4c3",
-            "sidebar-selected-text-color": "#1fd4c3",
-            "switch-checked-color": "#1fd4c3",
-            "switch-checked-track-color": "#12b6a6",
-            "paper-item-icon-active-color": "#1fd4c3",
-            "state-icon-active-color": "#1fd4c3",
-            "ha-card-border-radius": "18px",
-            "ha-card-box-shadow": "0 8px 30px rgba(4, 20, 26, 0.45)",
-            "label-badge-background-color": "#0c2a31",
-            "label-badge-text-color": "#e6fffb",
-            "table-row-background-color": "#0c2a31",
-            "table-row-alternative-background-color": "#0e333b",
-        }
-    }

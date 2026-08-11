@@ -1,0 +1,90 @@
+# Dezhoosh Gold - warm golden glass theme for Home Assistant.
+#
+# To use manually, copy this file into <config>/themes/ and add
+#   frontend:
+#     themes: !include_dir_merge_named themes
+# to configuration.yaml, then pick "Dezhoosh Gold" from your user profile.
+#
+# The Dezhoosh integration also registers this theme automatically at runtime.
+Dezhoosh Gold:
+  # Base palette
+  primary-color: "#c9a227"
+  accent-color: "#e8c547"
+  dark-primary-color: "#9a7b0a"
+  light-primary-color: "#f5e6b8"
+
+  # Backgrounds
+  primary-background-color: "#141008"
+  secondary-background-color: "#221a0c"
+  card-background-color: "rgba(42, 32, 12, 0.72)"
+  ha-card-background: "rgba(42, 32, 12, 0.72)"
+
+  # Text
+  primary-text-color: "#fff8e7"
+  secondary-text-color: "#d4b896"
+  text-primary-color: "#1a1408"
+  disabled-text-color: "#8a7354"
+
+  # Structure
+  divider-color: "rgba(232, 197, 71, 0.16)"
+  ha-card-border-radius: "18px"
+  ha-card-box-shadow: "0 8px 30px rgba(10, 8, 2, 0.45)"
+
+  # App header / sidebar
+  app-header-background-color: "rgba(20, 16, 8, 0.85)"
+  app-header-text-color: "#fff8e7"
+  sidebar-background-color: "rgba(20, 16, 8, 0.9)"
+  sidebar-icon-color: "#d4b896"
+  sidebar-selected-icon-color: "#e8c547"
+  sidebar-selected-text-color: "#e8c547"
+
+  # States / switches
+  switch-checked-color: "#e8c547"
+  switch-checked-track-color: "#c9a227"
+  paper-item-icon-active-color: "#e8c547"
+  state-icon-active-color: "#e8c547"
+
+  # Badges / tables
+  label-badge-background-color: "#221a0c"
+  label-badge-text-color: "#fff8e7"
+  table-row-background-color: "#221a0c"
+  table-row-alternative-background-color: "#2e2410"
+
+  # Forms / dropdowns / inputs
+  ha-color-form-background: "#221a0c"
+  ha-color-form-background-hover: "#2e2410"
+  ha-color-form-background-disabled: "#141008"
+  input-fill-color: "#221a0c"
+  input-ink-color: "#fff8e7"
+  input-label-ink-color: "#d4b896"
+  input-dropdown-icon-color: "#d4b896"
+  mdc-text-field-fill-color: "#221a0c"
+  mdc-text-field-ink-color: "#fff8e7"
+  mdc-text-field-label-ink-color: "#d4b896"
+  mdc-select-fill-color: "#221a0c"
+  mdc-select-ink-color: "#fff8e7"
+  mdc-select-label-ink-color: "#d4b896"
+  mdc-select-dropdown-icon-color: "#d4b896"
+  mdc-select-idle-line-color: "#d4b896"
+  mdc-select-hover-line-color: "#e8c547"
+  paper-listbox-background-color: "#221a0c"
+  paper-dialog-background-color: "#221a0c"
+  material-background-color: "#141008"
+  material-secondary-background-color: "#221a0c"
+  mdc-theme-surface: "#221a0c"
+  md-sys-color-surface: "#141008"
+  md-sys-color-surface-container: "#221a0c"
+  md-sys-color-surface-container-high: "#2e2410"
+  md-sys-color-on-surface: "#fff8e7"
+  md-sys-color-on-surface-variant: "#d4b896"
+  ha-list-item-hover-background-color: "color-mix(in srgb, #c9a227 20%, transparent)"
+  ha-list-item-focus-background-color: "color-mix(in srgb, #c9a227 30%, transparent)"
+  md-list-item-label-text-color: "#fff8e7"
+  md-list-item-supporting-text-color: "#d4b896"
+  md-list-item-hover-state-layer-color: "#c9a227"
+  md-list-item-hover-state-layer-opacity: "0.20"
+  md-list-item-focus-state-layer-color: "#c9a227"
+  md-list-item-focus-state-layer-opacity: "0.30"
+  wa-color-text-normal: "#fff8e7"
+  wa-color-text-quiet: "#d4b896"
+  wa-color-text-loud: "#fff8e7"
